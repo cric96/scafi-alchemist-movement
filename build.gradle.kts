@@ -151,6 +151,5 @@ fun makeTest(
     }*/
 }
 
-makeTest(name="hello", file = "hello_scafi", time = 100.0, vars = setOf("random"), taskSize = 2800)
-
+makeTest(name="flock", file = "basic-env")
 defaultTasks("fatJar")

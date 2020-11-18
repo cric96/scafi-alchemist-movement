@@ -60,5 +60,3 @@ displacements:
       concentration: 0.0
     - molecule: dy
       concentration: 0.0
-    - molecule: fold
-      concentration: 0

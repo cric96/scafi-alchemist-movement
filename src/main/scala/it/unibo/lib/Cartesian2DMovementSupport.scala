@@ -6,7 +6,7 @@ import it.unibo.scafi.space.{Point2D, Point3D}
 trait Cartesian2DMovementSupport extends MovementSupport {
   self : AggregateProgram with ScafiAlchemistSupport =>
   override type RAW_POSITION = Position[_]
-  val Origin : P = Point3D(0, 0, 0)
+  val Zero : P = Point3D(0.0, 0.0, 0.0)
   implicit def alchemistToScafi(p : P) : Position[_] = new Euclidean2DPosition(p.x, p.y)
   implicit def scafiToAlchemist(p : Position[_]) : P = Point3D(p.getCoordinate(0), p.getCoordinate(1), 0.0)
   implicit def tupleToVelocity(p : (Double, Double)) : Velocity = new Velocity(p._1, p._2, 0)
@@ -29,12 +29,12 @@ trait Cartesian2DMovementSupport extends MovementSupport {
    * @param center mass center
    */
   override def rotate(angle: Double, center: P): Velocity = {
-    val distance = distanceBetween(position, center)
-    val (computedX, computedY) = (
+    val distance = position.distance(center)
+    val computed = Point2D(
       center.x + distance * math.cos(angle),
       center.y + distance * math.sin(angle)
     )
-    Point2D(computedX - position.x, computedY - position.y)
+    computed - position
   }
   /**
    * concentrate each element of the field in the position passed
@@ -43,11 +43,11 @@ trait Cartesian2DMovementSupport extends MovementSupport {
    * @return the velocity that bring node into that point
    */
   override def collapseFieldIn(point: P): Velocity = {
-    val velocity : P = Point2D(point.x - position.x, point.y - position.y)
+    val velocity : P = point - position
     val distance : Double = math.floor(distanceBetween(point, position))
     (distance) match {
       case distance if distance == 0.0 => Point2D(0, 0)
-      case d => Point2D(velocity.x / d, velocity.y / d)
+      case d => velocity / d
     }
   }
 }

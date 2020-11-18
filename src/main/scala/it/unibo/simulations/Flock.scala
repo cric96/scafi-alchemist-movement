@@ -1,16 +1,16 @@
 package it.unibo.simulations
 
 import it.unibo.alchemist.model.scafi.ScafiIncarnationForAlchemist._
-import it.unibo.lib.Cartesian2DMovementSupport
-
+import it.unibo.lib.{Cartesian2DMovementSupport, FlockLib}
+import it.unibo.lib._
 class Flock extends AggregateProgram
   with StandardSensors with ScafiAlchemistSupport with BlockG with BlockC with BlockS with FieldUtils
-  with Cartesian2DMovementSupport{
+  with Cartesian2DMovementSupport with FlockLib {
 
   override type MainResult = Any
-
   override def main = {
-    move(collapseFieldIn(10.0, 0.0))
+    val flockValue = flocking(true)
+    move(flockValue / 5)
   }
 
 }

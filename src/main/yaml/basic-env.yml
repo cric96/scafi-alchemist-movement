@@ -46,7 +46,7 @@ positions:
 
 network-model:
   type: ConnectWithinDistance
-  parameters: [*commRadius]
+  parameters: [30]
 
 displacements:
   - in:
@@ -55,3 +55,10 @@ displacements:
     programs:
       - *program
       - *movement
+    contents:
+    - molecule: dx
+      concentration: 0.0
+    - molecule: dy
+      concentration: 0.0
+    - molecule: fold
+      concentration: 0

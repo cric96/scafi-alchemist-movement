@@ -13,6 +13,14 @@ trait MovementSupport {
    * @return the node position
    */
   def position : RAW_POSITION = sense[RAW_POSITION](LSNS_POSITION)
+
+  /**
+   * return a scalar distance between two position
+   * @param referencePoint the reference position
+   * @param targetPoint the target position
+   * @return a scalar that measure the distance.
+   */
+  def distanceBetween(referencePoint : P, targetPoint : P) : Double
   /**
    * move following the velocity specified.
    * @param velocity delta movement of the node

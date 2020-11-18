@@ -10,14 +10,15 @@ trait Cartesian2DMovementSupport extends MovementSupport {
   implicit def scafiToAlchemist(p : Position[_]) : P = Point3D(p.getCoordinate(0), p.getCoordinate(1), 0.0)
   implicit def tupleToVelocity(p : (Double, Double)) : Velocity = new Velocity(p._1, p._2, 0)
 
+  override def distanceBetween(referencePoint: Velocity, targetPoint: Velocity): Double = math.hypot(referencePoint.x - targetPoint.x, referencePoint.y - targetPoint.y)
   /**
    * move following the velocity specified.
    *
    * @param velocity delta movement of the node
    */
   override def move(velocity: P): Unit = {
-    val myself = alchemistEnvironment.getNodeByID(mid())
-    alchemistEnvironment.moveNode(myself, velocity)
+    node.put[Double]("dx", velocity.x)
+    node.put[Double]("dy", velocity.y)
   }
 
   /**
@@ -26,8 +27,14 @@ trait Cartesian2DMovementSupport extends MovementSupport {
    * @param angle  the degree of rotation
    * @param center mass center
    */
-  override def rotate(angle: Double, center: P): Velocity = Velocity.Zero
-
+  override def rotate(angle: Double, center: P): Velocity = {
+    val distance = distanceBetween(position, center)
+    val (computedX, computedY) = (
+      center.x + distance * math.cos(angle),
+      center.y + distance * math.sin(angle)
+    )
+    Point2D(computedX - position.x, computedY - position.y)
+  }
   /**
    * concentrate each element of the field in the position passed
    *
@@ -36,11 +43,10 @@ trait Cartesian2DMovementSupport extends MovementSupport {
    */
   override def collapseFieldIn(point: P): Velocity = {
     val velocity : P = Point2D(point.x - position.x, point.y - position.y)
-    val distance : Double = math.hypot(point.x - position.x, point.y - position.y)
-    (velocity.x / distance, velocity.y / distance) match {
-      case (Double.NaN, _) => Point2D(0, 0)
-      case (_, Double.NaN) => Point2D(0, 0)
-      case (vx, vy) => Point2D(vx, vy)
+    val distance : Double = math.floor(distanceBetween(point, position))
+    (distance) match {
+      case distance if distance == 0.0 => Point2D(0, 0)
+      case d => Point2D(velocity.x / d, velocity.y / d)
     }
   }
 }

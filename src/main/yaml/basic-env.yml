@@ -28,6 +28,15 @@ pools:
       actions:
         - type: RunScafiProgram
           parameters: [it.unibo.simulations.Flock, 20]
+  - pool: &movement
+    - time-distribution:
+        type: ExponentialTime
+        parameters: [1]
+      type: Event
+      actions:
+        - type: it.unibo.alchemist.DeltaMovement
+          parameters: []
+
 
 environment:
   type: Continuous2DEnvironment
@@ -45,3 +54,4 @@ displacements:
       parameters: [ 20, 0, 0, 50 ]
     programs:
       - *program
+      - *movement

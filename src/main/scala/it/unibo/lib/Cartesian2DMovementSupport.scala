@@ -1,19 +1,10 @@
 package it.unibo.lib
 import it.unibo.alchemist.model.scafi.ScafiIncarnationForAlchemist._
 import it.unibo.scafi.space.Point2D
-trait Cartesian2DMovementSupport extends MovementSupport {
-  self : AggregateProgram with ScafiAlchemistSupport with StandardSensors =>
-  override def distanceBetween(referencePoint: Velocity, targetPoint: Velocity): Double = math.hypot(referencePoint.x - targetPoint.x, referencePoint.y - targetPoint.y)
-  /**
-   * move following the velocity specified.
-   *
-   * @param velocity delta movement of the node
-   */
-  override def move(velocity: P): Unit = {
-    node.put[Double]("dx", velocity.x)
-    node.put[Double]("dy", velocity.y)
-  }
 
+trait Cartesian2DMovementSupport extends MovementSupport {
+  self : AggregateProgram with StandardSensors =>
+  override def distanceBetween(referencePoint: Velocity, targetPoint: Velocity): Double = math.hypot(referencePoint.x - targetPoint.x, referencePoint.y - targetPoint.y)
   /**
    * perform a global rotation fixed in a central point
    *
@@ -21,12 +12,12 @@ trait Cartesian2DMovementSupport extends MovementSupport {
    * @param center mass center
    */
   override def rotate(angle: Double, center: P): Velocity = {
-    val distance = position.distance(center)
+    val distance = currentPosition().distance(center)
     val computed = Point2D(
       center.x + distance * math.cos(angle),
       center.y + distance * math.sin(angle)
     )
-    computed - position
+    computed - currentPosition
   }
   /**
    * concentrate each element of the field in the position passed
@@ -35,8 +26,8 @@ trait Cartesian2DMovementSupport extends MovementSupport {
    * @return the velocity that bring node into that point
    */
   override def collapseFieldIn(point: P): Velocity = {
-    val velocity : P = point - position
-    val distance : Double = math.floor(distanceBetween(point, position))
+    val velocity : P = point - currentPosition
+    val distance : Double = math.floor(distanceBetween(point, currentPosition()))
     (distance) match {
       case distance if distance == 0.0 => Point2D(0, 0)
       case d => velocity / d

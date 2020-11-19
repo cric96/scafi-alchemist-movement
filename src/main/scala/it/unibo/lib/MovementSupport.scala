@@ -4,7 +4,7 @@ import it.unibo.lib.MovementSupport.CoordinateMapping
 trait MovementSupport {
   self : AggregateProgram with StandardSensors =>
   type Velocity = P
-  type SIMULATION_POSITION
+  type SIMULATION_POSITION //environment should have another position type...
   implicit def mapping: CoordinateMapping[SIMULATION_POSITION, P]
   implicit def toSimulation(point : P) : SIMULATION_POSITION = mapping.toExternal(point)
   implicit def toInternal(point : SIMULATION_POSITION) : P = mapping.toInternal(point)
@@ -13,12 +13,6 @@ trait MovementSupport {
   }
 
   override def currentPosition(): P = sense[SIMULATION_POSITION](LSNS_POSITION)
-  /**
-   * a shorthand to calculate the position field
-   * @return the node position
-   */
-  def position : SIMULATION_POSITION = sense[SIMULATION_POSITION](LSNS_POSITION)
-
   /**
    * return a scalar distance between two position
    * @param referencePoint the reference position

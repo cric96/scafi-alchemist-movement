@@ -1,6 +1,6 @@
 package it.unibo.lib
-import it.unibo.alchemist.model.scafi.ScafiIncarnationForAlchemist._
-import it.unibo.scafi.space.{Point2D, Point3D}
+import it.unibo.alchemist.model.scafi.ScafiIncarnationForAlchemist._ //TODO: fix, avoid to import entire cake, create a lib that might be extended by other platform
+import it.unibo.scafi.space.Point3D
 trait FlockLib extends FieldUtils {
   self:  AggregateProgram with StandardSensors with MovementSupport =>
 
@@ -10,7 +10,7 @@ trait FlockLib extends FieldUtils {
     rep[Velocity](Zero){
       v => {
         val activeNodes = foldhood[Seq[Point3D]](Seq.empty[Point3D])(_ ++ _){
-          mux(flockingField)(Seq[P](nbr(position)))(Seq.empty[Point3D])
+          mux(flockingField)(Seq[P](nbr(currentPosition())))(Seq.empty[Point3D])
         }
         val vectorRepulsion: Velocity = this.separation(separationDistance, v)
         val vectorAlignment: Velocity = this.alignment(flockingField, v, activeNodes.size)
@@ -74,14 +74,14 @@ trait FlockLib extends FieldUtils {
 
   private def cohesion(neighbors: Seq[Point3D]): P = {
     val cohesionVector = neighbors.fold(Zero)((a,b) => a + b)
-    normalize((cohesionVector / neighbors.size) - position)
+    normalize((cohesionVector / neighbors.size) - currentPosition())
   }
 
   private def separation(separationDistance: Double, velocity: Velocity): P = {
-    val closestNeighbours = foldhood(Seq.empty[P])(_ ++ _)(Seq(nbr(position)))
+    val closestNeighbours = foldhood(Seq.empty[P])(_ ++ _)(Seq(nbr(currentPosition())))
       .filter(point => point.module < separationDistance)
 
-    val separationVector = closestNeighbours.fold[P](Zero)((acc, b) => acc + (b - position))
+    val separationVector = closestNeighbours.fold[P](Zero)((acc, b) => acc + (b - currentPosition()))
     normalize(-(separationVector / closestNeighbours.size))
   }
 
@@ -91,7 +91,7 @@ trait FlockLib extends FieldUtils {
   }
 
   def goToPointWithSeparation(point: P, separationDistance: Double): P = {
-    val currentPos = position
+    val currentPos = currentPosition()
     val pointVect =  point - currentPos
     val separationVector: P = this.separation(separationDistance, Zero)
 

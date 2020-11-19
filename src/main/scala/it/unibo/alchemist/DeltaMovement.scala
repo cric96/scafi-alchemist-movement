@@ -9,6 +9,7 @@ class DeltaMovement[T](env : Environment[T, Euclidean2DPosition], node : Node[T]
   val manager = new SimpleNodeManager[T](node)
 
   def getDeltaVector : (Double, Double) = (manager.getOrElse("dx", 0.0), manager.getOrElse("dy", 0.0))
+
   override def getNextPosition: Euclidean2DPosition = {
     new Euclidean2DPosition(getDeltaVector._1,getDeltaVector._2)
   }

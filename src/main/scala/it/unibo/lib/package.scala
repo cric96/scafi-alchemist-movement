@@ -1,8 +1,14 @@
 package it.unibo
 
+import it.unibo.alchemist.model.implementations.positions.Euclidean2DPosition
+import it.unibo.alchemist.model.interfaces.Position
+import it.unibo.alchemist.model.scafi.ScafiIncarnationForAlchemist.P
 import it.unibo.scafi.space.{Point2D, Point3D}
 
 package object lib {
+  //CONVERSION
+  implicit def tupleToVelocity(p : (Double, Double)) : Point3D = new Point3D(p._1, p._2, 0)
+  //TYPE ENRICHMENT
   implicit class RichPoint3D(p : Point3D) {
     val module : Double = math.hypot(p.x, p.y)
     val unary : Point2D = Point2D(p.x / module, p.y / module)
@@ -12,4 +18,6 @@ package object lib {
     def /(alpha : Double) : Point3D = p * (1.0 / alpha)
     def ===(other : Point3D) : Boolean = other.x == p.x && other.y == p.x && other.z == p.z //todo solve the bug in scafi lib
   }
+
+  val Zero = Point3D(0,0,0)
 }

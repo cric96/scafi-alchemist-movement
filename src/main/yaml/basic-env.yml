@@ -47,12 +47,12 @@ positions:
 
 network-model:
   type: ConnectWithinDistance
-  parameters: [5]
+  parameters: [10]
 
 displacements:
   - in:
       type: Circle
-      parameters: [ 1000, 0, 0, 50 ]
+      parameters: [ 100, 0, 0, 50 ]
     programs:
       - *program
       - *movement

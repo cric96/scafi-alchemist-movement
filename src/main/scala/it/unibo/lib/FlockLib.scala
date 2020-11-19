@@ -2,7 +2,7 @@ package it.unibo.lib
 import it.unibo.alchemist.model.scafi.ScafiIncarnationForAlchemist._
 import it.unibo.scafi.space.{Point2D, Point3D}
 trait FlockLib extends FieldUtils {
-  self:  AggregateProgram with StandardSensors with Cartesian2DMovementSupport =>
+  self:  AggregateProgram with StandardSensors with MovementSupport =>
 
   def flocking(flockingField: Boolean,
                attractionForce: Double = 1.0, alignmentForce: Double = 1.0, repulsionForce: Double = 1.0, separationDistance: Double = Double.PositiveInfinity): Velocity = {

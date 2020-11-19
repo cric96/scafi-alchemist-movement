@@ -1,18 +1,23 @@
 package it.unibo.lib
 import it.unibo.alchemist.model.scafi.ScafiIncarnationForAlchemist._
+import it.unibo.lib.MovementSupport.CoordinateMapping
 trait MovementSupport {
-  self : AggregateProgram =>
+  self : AggregateProgram with StandardSensors =>
   type Velocity = P
-  type RAW_POSITION
-
+  type SIMULATION_POSITION
+  implicit def mapping: CoordinateMapping[SIMULATION_POSITION, P]
+  implicit def toSimulation(point : P) : SIMULATION_POSITION = mapping.toExternal(point)
+  implicit def toInternal(point : SIMULATION_POSITION) : P = mapping.toInternal(point)
   object Velocity {
     val Zero = new Velocity(0,0,0)
   }
+
+  override def currentPosition(): P = sense[SIMULATION_POSITION](LSNS_POSITION)
   /**
    * a shorthand to calculate the position field
    * @return the node position
    */
-  def position : RAW_POSITION = sense[RAW_POSITION](LSNS_POSITION)
+  def position : SIMULATION_POSITION = sense[SIMULATION_POSITION](LSNS_POSITION)
 
   /**
    * return a scalar distance between two position
@@ -38,4 +43,11 @@ trait MovementSupport {
    * @return the velocity that bring node into that point
    */
   def collapseFieldIn(point : P) : Velocity
+}
+
+object MovementSupport {
+  trait CoordinateMapping[EXTERNAL, INTERNAL] {
+    def toInternal(p : EXTERNAL) : INTERNAL
+    def toExternal(p : INTERNAL) : EXTERNAL
+  }
 }

@@ -8,7 +8,7 @@ class Flock extends AggregateProgram
 
   override type MainResult = Any
   override def main = {
-    val flockValue = flocking(true, separationDistance = 30.0)
+    val flockValue = flocking(true)
     move(flockValue)
   }
 

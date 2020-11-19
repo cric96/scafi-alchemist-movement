@@ -11,5 +11,5 @@ trait Basic2DMovementBehaviour {
 
   def anticlockwiseRotation(center : P) : Velocity = -clockwiseRotation(center)
 
-  def goToPoint(point : P) : Velocity = point - currentPosition()
+  def goToPoint(point : P) : Velocity = (point - currentPosition()).normalized
 }

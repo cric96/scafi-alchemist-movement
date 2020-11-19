@@ -1,100 +1,76 @@
 package it.unibo.lib
 import it.unibo.alchemist.model.scafi.ScafiIncarnationForAlchemist._ //TODO: fix, avoid to import entire cake, create a lib that might be extended by other platform
 import it.unibo.scafi.space.Point3D
+/**
+  * implementation taken by https://gamedevelopment.tutsplus.com/tutorials/3-simple-rules-of-flocking-behaviors-alignment-cohesion-and-separation--gamedev-3444
+ */
 trait FlockLib extends FieldUtils {
-  self:  AggregateProgram with StandardSensors with MovementSupport =>
+  self: AggregateProgram with StandardSensors with MovementSupport =>
+
+  private def concatenateVectors(vectors : (Velocity)*) : Velocity = {
+    vectors.fold(Zero)(_ + _)
+  }
+
+  private def getValuesFromActiveNode[E](flockingField : Boolean)(value : => E) : Seq[E] = {
+    foldhood[Seq[E]](Seq.empty[E])(_ ++ _){
+      mux(flockingField){
+        Seq[E](nbr(value))
+      } /* else */ {
+        Seq.empty[E]
+      }
+    }
+  }
 
   def flocking(flockingField: Boolean,
                attractionForce: Double = 1.0, alignmentForce: Double = 1.0, repulsionForce: Double = 1.0, separationDistance: Double = Double.PositiveInfinity): Velocity = {
 
     rep[Velocity](Zero){
       v => {
-        val activeNodes = foldhood[Seq[Point3D]](Seq.empty[Point3D])(_ ++ _){
-          mux(flockingField)(Seq[P](nbr(currentPosition())))(Seq.empty[Point3D])
-        }
-        val vectorRepulsion: Velocity = this.separation(separationDistance, v)
-        val vectorAlignment: Velocity = this.alignment(flockingField, v, activeNodes.size)
-        val vectorAttraction: Velocity = this.cohesion(activeNodes)
-        val vectorX: Double = (vectorAttraction.x * attractionForce
-          + vectorRepulsion.x * repulsionForce
-          + vectorAlignment.x * alignmentForce)
-        val vectorY: Double = (vectorAttraction.y * attractionForce
-          + vectorRepulsion.y * repulsionForce
-          + vectorAlignment.y * alignmentForce)
+        val activeNodes = getValuesFromActiveNode(flockingField)(currentPosition())
 
-        normalize(v + (vectorX, vectorY))
+        val resultingVector = concatenateVectors(
+          this.separation(activeNodes, separationDistance) * repulsionForce,
+          this.alignment(flockingField, v, activeNodes.size) * alignmentForce,
+          this.cohesion(activeNodes) * attractionForce
+        )
+
+        normalize(v + resultingVector)
       }
     }
   }
 
-  def flockingAvoidObstacle(flockingField: Boolean, obstacleField: Boolean, separationDistance: Double,
-                            attractionForce: Double, alignmentForce: Double, repulsionForce: Double, obstacleForce: Double) : Velocity = {
-    rep[Velocity](Zero){
-      v => {
-        val activeNodes = foldhood[Seq[Point3D]](Seq.empty[Point3D])(_ ++ _){
-          mux(flockingField)(Seq(nbrVector()))(Seq.empty[Point3D])
-        }
-        val vectorRepulsion: Velocity = this.separation(separationDistance, v)
-        val vectorAlignment: Velocity = this.alignment(flockingField, v, activeNodes.size)
-        val vectorAttraction: Velocity = this.cohesion(activeNodes)
-        val vectorObstacle: Velocity = this.obstacle(obstacleField)
-        val vectorX: Double = (vectorAttraction.x * attractionForce
-          + vectorRepulsion.x * repulsionForce
-          + vectorAlignment.x * alignmentForce
-          + vectorObstacle.x * obstacleForce)
-        val vectorY: Double = (vectorAttraction.y * attractionForce
-          + vectorRepulsion.y * repulsionForce
-          + vectorAlignment.y * alignmentForce
-          + vectorObstacle.y * obstacleForce)
-
-        normalize(v + (vectorX, vectorY))
-      }
-    }
-  }
-
-  private def obstacle(obstacleField: Boolean): P = {
-    val obstaclesVector = foldhood[Seq[Point3D]](Seq.empty[P])(_ ++ _){
-      mux(obstacleField)(Seq(nbrVector()))(Seq())
-    }.fold(Zero)(_ + _)
-    - normalize(obstaclesVector)
-  }
-
-  private def alignment(flockingSensor: Boolean, velocity: Velocity, neighbourCount : Int): P = {
-    val alignmentVector: P =
-      foldhood(Zero)(_ + _){
-        mux(flockingSensor) {
-          nbr(velocity)
-        } {
-          Zero
-        }
-      }
-
+  def alignment(flockingSensor: Boolean, velocity: Velocity, neighbourCount : Int): Velocity = {
+    val alignmentVector: P = getValuesFromActiveNode(flockingSensor)(velocity).fold(Zero)(_ + _)
     normalize(alignmentVector / neighbourCount)
   }
 
-  private def cohesion(neighbors: Seq[Point3D]): P = {
+  def cohesion(neighbors: Seq[Point3D]): Velocity = {
     val cohesionVector = neighbors.fold(Zero)((a,b) => a + b)
     normalize((cohesionVector / neighbors.size) - currentPosition())
   }
 
-  private def separation(separationDistance: Double, velocity: Velocity): P = {
-    val closestNeighbours = foldhood(Seq.empty[P])(_ ++ _)(Seq(nbr(currentPosition())))
-      .filter(point => point.module < separationDistance)
-
-    val separationVector = closestNeighbours.fold[P](Zero)((acc, b) => acc + (b - currentPosition()))
-    normalize(-(separationVector / closestNeighbours.size))
+  def separation(activeNode : Seq[Point3D], separationDistance: Double): Velocity = {
+    val closestNeighbours = inRange(activeNode, separationDistance).map(_ - currentPosition())
+    val separationVector = closestNeighbours.fold[P](Zero)((acc, b) => acc + b)
+    normalize(-separationVector / closestNeighbours.size)
   }
 
-  def normalize(point : P): P = {
-    //todo fix it
-    mux(point.module == 0.0 || point.module.isNaN) { Zero } { point.unary }
-  }
+  def normalize(point : P): P = point.normalized
 
-  def goToPointWithSeparation(point: P, separationDistance: Double): P = {
+  def goToPointWithSeparation(movementField : Boolean, point: P, separationDistance: Double): P = {
     val currentPos = currentPosition()
-    val pointVect =  point - currentPos
-    val separationVector: P = this.separation(separationDistance, Zero)
-
-    normalize(pointVect + separationVector)
+    val pointVect = point - currentPos
+    val activeNode = getValuesFromActiveNode(movementField)(currentPosition())
+    normalize((pointVect.normalized / activeNode.count(_.module < separationDistance)) +  this.separation(activeNode, separationDistance))
   }
+
+  def withSeparation(selector : Boolean)(velocity: Velocity)(separationDistance: Double) : P = {
+    val activeNodeInRange = inRange(getValuesFromActiveNode(selector)(currentPosition()), separationDistance)
+    ((velocity / (activeNodeInRange.size + 1)) + separation(activeNodeInRange, separationDistance)).normalized
+  }
+
+  def withSeparation(velocity: Velocity)(separationDistance: Double) : P = withSeparation(true)(velocity)(separationDistance)
+
+  private def inRange(neighbours : Seq[Point3D], range : Double) : Seq[Point3D] = neighbours
+    .filter(vector => currentPosition().distance(vector) < range)
 }

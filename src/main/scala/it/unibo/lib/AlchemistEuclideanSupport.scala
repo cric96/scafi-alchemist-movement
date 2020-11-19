@@ -3,8 +3,8 @@ import it.unibo.alchemist.model.implementations.positions.Euclidean2DPosition
 import it.unibo.alchemist.model.scafi.ScafiIncarnationForAlchemist._
 import it.unibo.lib.MovementSupport.CoordinateMapping
 import it.unibo.scafi.space.Point2D
-trait AlchemistEuclideanSupport {
-  self : MovementSupport with AggregateProgram with StandardSensors with ScafiAlchemistSupport =>
+trait AlchemistEuclideanSupport extends MovementSupport {
+  self : AggregateProgram with StandardSensors with ScafiAlchemistSupport =>
   override type SIMULATION_POSITION = Euclidean2DPosition
   override implicit val mapping: CoordinateMapping[Euclidean2DPosition, P] = new CoordinateMapping[Euclidean2DPosition, P] {
     override def toInternal(p: SIMULATION_POSITION): P = Point2D(p.getX, p.getY)

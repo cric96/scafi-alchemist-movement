@@ -1,0 +1,86 @@
+variables:
+  random: &random
+    min: 0
+    max: 29
+    step: 1
+    default: 2
+  commRadius: &commRadius
+    min: 35
+    max: 55
+    step: 15.0
+    default: 50.0
+
+
+export:
+  - time
+
+seeds:
+  scenario: *random
+  simulation: *random
+  
+incarnation: scafi
+
+pools:
+  - pool: &program
+    - time-distribution:
+        type: ExponentialTime
+        parameters: [1]
+      type: Event
+      actions:
+        - type: RunScafiProgram
+          parameters: [it.unibo.simulations.AdvancedFlocking, 5.0]
+    - program: send
+  - pool: &movement
+      - time-distribution:
+          type: ExponentialTime
+          parameters: [ 1 ]
+        type: Event
+        actions:
+          - type: it.unibo.alchemist.DeltaMovement
+
+
+environment:
+  type: Continuous2DEnvironment
+
+positions:
+  type: EuclideanPosition2D
+
+network-model:
+  type: ConnectWithinDistance
+  parameters: [10]
+
+displacements:
+  - in:
+      type: Circle
+      parameters: [ 20, 0, 0, 10 ]
+    programs:
+      - *program
+      - *movement
+    contents:
+    - molecule: dx
+      concentration: 0.0
+    - molecule: dy
+      concentration: 0.0
+    - molecule: mode
+      concentration: >
+        "goto"
+  - in:
+      type: Circle
+      parameters: [ 20, -30, -30, 10 ]
+    programs:
+      - *program
+      - *movement
+    contents:
+      - molecule: mode
+        concentration: >
+          "wind"
+  - in:
+      type: Circle
+      parameters: [ 20, -30, -30, 10 ]
+    programs:
+      - *program
+      - *movement
+    contents:
+      - molecule: mode
+        concentration: >
+          "your"

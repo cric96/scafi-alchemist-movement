@@ -1,0 +1,72 @@
+variables:
+  random: &random
+    min: 0
+    max: 29
+    step: 1
+    default: 2
+  commRadius: &commRadius
+    min: 5
+    max: 10
+    step: 2.0
+    default: 5
+  howMany: &howMany
+    formula : 50
+  centerX : &centerX
+    formula : 0
+  centerY : &centerY
+    formula : 0
+  radius : &radius
+    formula : 30
+
+export:
+  - time
+
+seeds:
+  scenario: *random
+  simulation: *random
+  
+incarnation: scafi
+
+pools:
+  - pool: &program ### scafi program
+    - time-distribution:
+        type: ExponentialTime
+        parameters: [1]
+      type: Event
+      actions:
+        - type: RunScafiProgram
+          parameters: [it.unibo.simulations.ConstantMovement, 5.0] ### here is defined the class name of ScaFi program
+    - program: send
+  - pool: &movement
+      - time-distribution:
+          type: ExponentialTime
+          parameters: [1]
+        type: Event
+        actions:
+          - type: it.unibo.alchemist.DeltaMovement # our simulated actuator
+
+
+environment:
+  type: Continuous2DEnvironment #environment type todo put alternatives
+
+positions:
+  type: EuclideanPosition2D
+
+network-model:
+  type: ConnectWithinDistance
+  parameters: [*commRadius]
+
+displacements:
+  - in:
+      type: Circle
+      parameters: [ *howMany, *centerX, *centerY, *radius ]
+    programs:
+      - *program
+      - *movement
+    contents:
+    - molecule: dx
+      concentration: 0.0
+    - molecule: dy
+      concentration: 0.0
+
+## put alternatives for displacement

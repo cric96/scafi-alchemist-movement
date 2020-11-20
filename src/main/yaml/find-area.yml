@@ -9,6 +9,8 @@ variables:
     max: 55
     step: 15.0
     default: 50.0
+  target: &target
+    formula: "\"target\""
 
 export:
   - time
@@ -16,7 +18,11 @@ export:
 seeds:
   scenario: *random
   simulation: *random
-  
+
+layers:
+  - type: BidimensionalGaussianLayer
+    molecule: *target
+    parameters: [100.0, 150.0, 20.0, 15.0]
 incarnation: scafi
 
 pools:
@@ -27,7 +33,7 @@ pools:
       type: Event
       actions:
         - type: RunScafiProgram
-          parameters: [it.unibo.simulations.Flock, 5.0]
+          parameters: [it.unibo.simulations.FindArea, 5.0]
     - program: send
   - pool: &movement
       - time-distribution:
@@ -46,12 +52,12 @@ positions:
 
 network-model:
   type: ConnectWithinDistance
-  parameters: [10]
+  parameters: [50]
 
 displacements:
   - in:
       type: Circle
-      parameters: [ 100, 0, 0, 30 ]
+      parameters: [ 40, 0, 0, 60 ]
     programs:
       - *program
       - *movement
@@ -60,3 +66,7 @@ displacements:
       concentration: 0.0
     - molecule: dy
       concentration: 0.0
+  - in:
+      type: Point
+      # Using a constructor taking (x,y) coordinates
+      parameters: [150, 150]

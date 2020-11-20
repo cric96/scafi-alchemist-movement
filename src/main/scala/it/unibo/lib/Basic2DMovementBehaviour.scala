@@ -1,6 +1,7 @@
 package it.unibo.lib
 import it.unibo.alchemist.model.scafi.ScafiIncarnationForAlchemist._
 import it.unibo.scafi.space.Point2D
+import org.antlr.v4.runtime.misc.DoubleKeyMap
 trait Basic2DMovementBehaviour {
   self : MovementSupport =>
 
@@ -12,4 +13,6 @@ trait Basic2DMovementBehaviour {
   def anticlockwiseRotation(center : P) : Velocity = -clockwiseRotation(center)
 
   def goToPoint(point : P) : Velocity = (point - currentPosition()).normalized
+
+  def standStill : Velocity = Zero
 }

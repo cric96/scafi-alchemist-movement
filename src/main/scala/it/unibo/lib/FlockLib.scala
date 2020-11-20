@@ -26,24 +26,28 @@ trait FlockLib extends FieldUtils {
                             attractionForce: Double = 1.0,
                             alignmentForce: Double = 1.0,
                             repulsionForce: Double = 1.0,
-                            separationDistance: Double = Double.PositiveInfinity) {
-    def exec() : Velocity = {
+                            separationDistance: Double = Double.PositiveInfinity,
+                            otherVelocityEvaluation : List[() => Velocity] = List.empty) {
+    def run() : Velocity = {
       rep[Velocity](Zero){
         v => {
           val activeNodes = getValuesFromActiveNode(flockingField)(currentPosition())
-          val resultingVector = concatenateVectors(
+          val mainVector = List(
             separation(activeNodes, separationDistance) * repulsionForce,
             alignment(flockingField, v, activeNodes.size) * alignmentForce,
-            cohesion(activeNodes) * attractionForce,
+            cohesion(activeNodes) * attractionForce
           )
+          val other = otherVelocityEvaluation.map(_())
+          val resultingVector = concatenateVectors((other ::: mainVector):_*)
+
           normalize(v + resultingVector)
         }
       }
     }
   }
 
-  def flock() : Velocity = FlockBehaviour().exec()
-  def antiflock() : Velocity = FlockBehaviour(attractionForce = -1, alignmentForce = - 1, repulsionForce = -1).exec()
+  def flock() : Velocity = FlockBehaviour().run()
+  def antiflock() : Velocity = FlockBehaviour(attractionForce = -1, alignmentForce = - 1, repulsionForce = -1).run()
 
   def alignment(flockingSensor: Boolean, velocity: Velocity, neighbourCount : Int): Velocity = {
     val alignmentVector: P = getValuesFromActiveNode(flockingSensor)(velocity).fold(Zero)(_ + _)
@@ -65,13 +69,21 @@ trait FlockLib extends FieldUtils {
 
   def normalize(point : P): P = point.normalized
 
-  def withSeparation(selector : Boolean)(velocity: Velocity)(separationDistance: Double) : P = {
-    val activeNodeInRange = inRange(getValuesFromActiveNode(selector)(currentPosition()), separationDistance)
-    ((velocity / (activeNodeInRange.size + 1)) + separation(activeNodeInRange, separationDistance)).normalized
+  def withSeparation(selector : Boolean)(velocity: => Velocity)(separationDistance: Double) : Velocity = {
+    branch[Velocity](selector) {
+      val activeNodeInRange = inRange(getValuesFromActiveNode(selector)(currentPosition()), separationDistance)
+      ((velocity / (activeNodeInRange.size + 1)) + separation(activeNodeInRange, separationDistance)).normalized
+    } {
+      Velocity.Zero
+    }
   }
 
   def withSeparation(velocity: Velocity)(separationDistance: Double) : P = withSeparation(true)(velocity)(separationDistance)
 
   private def inRange(neighbours : Seq[Point3D], range : Double) : Seq[Point3D] = neighbours
     .filter(vector => currentPosition().distance(vector) < range)
+}
+
+object FlockLib {
+  type Dependencies = AggregateProgram with StandardSensors with MovementSupport
 }

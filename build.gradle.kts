@@ -151,5 +151,11 @@ fun makeTest(
     }*/
 }
 
-makeTest(name="flock", file = "basic-env")
+makeTest(name="flock", file = "flock")
+makeTest(name="steering", file = "steering")
+makeTest(name="constant-movement", file = "constant-movement")
+makeTest(name="movement-combination", file = "movement-combination")
+makeTest(name="basic-movement", file = "basic-movement")
+makeTest(name="advanced-flocking", file = "advanced-flocking")
+makeTest(name="find-area", file = "find-area")
 defaultTasks("fatJar")

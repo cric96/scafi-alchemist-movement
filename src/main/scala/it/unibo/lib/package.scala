@@ -1,6 +1,6 @@
 package it.unibo
 
-import it.unibo.scafi.space.Point3D.{toPoint1D, toPoint2D}
+import it.unibo.scafi.space.Point3D.toPoint2D
 import it.unibo.scafi.space.{Point2D, Point3D}
 
 package object lib {

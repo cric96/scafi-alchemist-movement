@@ -1,4 +1,5 @@
 package it.unibo.lib
+
 import it.unibo.alchemist.model.implementations.positions.Euclidean2DPosition
 import it.unibo.alchemist.model.scafi.ScafiIncarnationForAlchemist._
 import it.unibo.lib.MovementSupport.CoordinateMapping

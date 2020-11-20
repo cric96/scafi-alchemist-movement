@@ -22,26 +22,29 @@ trait FlockLib extends FieldUtils {
     }
   }
 
-  def flocking(flockingField: Boolean,
-               attractionForce: Double = 1.0, alignmentForce: Double = 1.0, repulsionForce: Double = 1.0, separationDistance: Double = Double.PositiveInfinity): Velocity = {
-
-    rep[Velocity](Zero){
-      v => {
-        val activeNodes = getValuesFromActiveNode(flockingField)(currentPosition())
-        val resultingVector = concatenateVectors(
-          this.separation(activeNodes, separationDistance) * repulsionForce,
-          this.alignment(flockingField, v, activeNodes.size) * alignmentForce,
-          this.cohesion(activeNodes) * attractionForce,
-        )
-        normalize(v + resultingVector)
+  case class FlockBehaviour(flockingField: Boolean = true,
+                            attractionForce: Double = 1.0,
+                            alignmentForce: Double = 1.0,
+                            repulsionForce: Double = 1.0,
+                            separationDistance: Double = Double.PositiveInfinity) {
+    def exec() : Velocity = {
+      rep[Velocity](Zero){
+        v => {
+          val activeNodes = getValuesFromActiveNode(flockingField)(currentPosition())
+          val resultingVector = concatenateVectors(
+            separation(activeNodes, separationDistance) * repulsionForce,
+            alignment(flockingField, v, activeNodes.size) * alignmentForce,
+            cohesion(activeNodes) * attractionForce,
+          )
+          normalize(v + resultingVector)
+        }
       }
     }
   }
 
-  def antiflocking(flockingField: Boolean,
-                   attractionForce: Double = 1.0, alignmentForce: Double = 1.0, repulsionForce: Double = 1.0, separationDistance: Double = Double.PositiveInfinity) : Velocity = {
-    flocking(flockingField, -attractionForce, -alignmentForce, -repulsionForce, separationDistance)
-  }
+  def flock() : Velocity = FlockBehaviour().exec()
+  def antiflock() : Velocity = FlockBehaviour(attractionForce = -1, alignmentForce = - 1, repulsionForce = -1).exec()
+
   def alignment(flockingSensor: Boolean, velocity: Velocity, neighbourCount : Int): Velocity = {
     val alignmentVector: P = getValuesFromActiveNode(flockingSensor)(velocity).fold(Zero)(_ + _)
     normalize(alignmentVector / neighbourCount)

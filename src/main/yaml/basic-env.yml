@@ -36,7 +36,6 @@ pools:
         type: Event
         actions:
           - type: it.unibo.alchemist.DeltaMovement
-            parameters: [ ]
 
 
 environment:
@@ -52,7 +51,7 @@ network-model:
 displacements:
   - in:
       type: Circle
-      parameters: [ 100, 0, 0, 50 ]
+      parameters: [ 100, 0, 0, 30 ]
     programs:
       - *program
       - *movement

@@ -1,7 +1,6 @@
 package it.unibo.lib
 import it.unibo.alchemist.model.scafi.ScafiIncarnationForAlchemist._
 import it.unibo.scafi.space.Point2D
-import org.antlr.v4.runtime.misc.DoubleKeyMap
 trait Basic2DMovementBehaviour {
   self : MovementSupport =>
 

@@ -1,7 +1,6 @@
 package it.unibo.lib
 
 import it.unibo.alchemist.model.scafi.ScafiIncarnationForAlchemist.P
-import it.unibo.scafi.space.Point2D
 
 trait ComplexFlockBehaviour extends FlockLib {
   self : FlockLib.Dependencies =>

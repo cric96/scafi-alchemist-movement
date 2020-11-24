@@ -43,7 +43,7 @@ pools:
           parameters: [1]
         type: Event
         actions:
-          - type: it.unibo.alchemist.DeltaMovement # our simulated actuator
+          - type: it.unibo.incarnation.alchemist.DeltaMovement
 
 
 environment:

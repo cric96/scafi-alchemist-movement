@@ -1,10 +1,9 @@
 package it.unibo.simulations
 
-import it.unibo.alchemist.model.scafi.ScafiIncarnationForAlchemist.{ScafiAlchemistSupport, _}
-import it.unibo.lib.{AlchemistEuclideanSupport, Basic2DMovementBehaviour, ComplexFlockBehaviour, FlockLib, MovementAggregateProgram, RichPoint3D, Steering, Zero}
+import it.unibo.lib.movement.AlchemistMovementIncarnation._
+import it.unibo.lib.movement._
 import it.unibo.scafi.space.Point2D
-class FindArea extends MovementAggregateProgram with StandardSensors with ScafiAlchemistSupport with AlchemistEuclideanSupport
-  with FlockLib with Basic2DMovementBehaviour with BuildingBlocks with Steering with ComplexFlockBehaviour {
+class FindArea extends Movement2DProgram with FlockLib with Movement2D with BuildingBlocks with Steering with AdvancedFlock {
 
   def localFoundZone : Boolean = senseEnv[Double]("target") > 2.0
   def someoneFoundZone : Boolean = rep(false)(init => foldhood(init)(_ || _)(nbr(localFoundZone || init)))
@@ -14,7 +13,7 @@ class FindArea extends MovementAggregateProgram with StandardSensors with ScafiA
   val trajectoryTime = 300
   val reachingGoalRange = 30
 
-  override def movementBody(): Velocity = {
+  override def movementLogic(): Velocity = {
     val (vel, _) = rep[(Velocity, Option[P])]((Zero, None)){
       case (v, oldGoal) => {
         val localFound = mux[Option[P]](localFoundZone) {

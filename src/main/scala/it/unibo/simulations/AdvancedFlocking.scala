@@ -1,15 +1,11 @@
 package it.unibo.simulations
 
-import it.unibo.alchemist.model.scafi.ScafiIncarnationForAlchemist.ScafiAlchemistSupport
-import it.unibo.lib.{AlchemistEuclideanSupport, ComplexFlockBehaviour, FlockLib, MovementAggregateProgram}
-import it.unibo.alchemist.model.scafi.ScafiIncarnationForAlchemist._
-import it.unibo.lib._
+import it.unibo.lib.movement.AlchemistMovementIncarnation._
 import it.unibo.scafi.space.Point2D
+import it.unibo.lib.movement._
 
-class AdvancedFlocking extends MovementAggregateProgram
-  with StandardSensors with ScafiAlchemistSupport with FlockLib with AlchemistEuclideanSupport with ComplexFlockBehaviour with BlockT
-  with Basic2DMovementBehaviour {
-  override def movementBody(): Velocity = sense[String]("mode") match {
+class AdvancedFlocking extends Movement2DProgram with FlockLib with AdvancedFlock with BlockT with Movement2D {
+  override def movementLogic(): AlchemistMovementIncarnation.Velocity = sense[String]("mode") match {
     case "goto" => FlockBehaviour().withGoal(Point2D(200.0, 100.0), 0.1).run()
     case "wind" => mux(T(100) != 0) {
       FlockBehaviour().withWind((1.0, 1.0)).run()

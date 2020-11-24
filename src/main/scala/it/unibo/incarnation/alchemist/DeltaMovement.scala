@@ -1,4 +1,4 @@
-package it.unibo.alchemist
+package it.unibo.incarnation.alchemist
 
 import it.unibo.alchemist.model.implementations.actions.AbstractMoveNode
 import it.unibo.alchemist.model.implementations.nodes.SimpleNodeManager

@@ -1,9 +1,10 @@
 package it.unibo.lib
+
 import it.unibo.alchemist.model.scafi.ScafiIncarnationForAlchemist._ //TODO: fix, avoid to import entire cake, create a lib that might be extended by other platform
 import it.unibo.scafi.space.Point3D
 /**
  *
-   * implementation taken by https://gamedevelopment.tutsplus.com/tutorials/3-simple-rules-of-flocking-behaviors-alignment-cohesion-and-separation--gamedev-3444
+ * implementation taken by https://gamedevelopment.tutsplus.com/tutorials/3-simple-rules-of-flocking-behaviors-alignment-cohesion-and-separation--gamedev-3444
  */
 trait FlockLib extends FieldUtils {
   self: AggregateProgram with StandardSensors with MovementSupport =>

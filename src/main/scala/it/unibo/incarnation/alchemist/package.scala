@@ -1,4 +1,4 @@
-package it.unibo
+package it.unibo.incarnation
 
 import it.unibo.alchemist.model.implementations.nodes.NodeManager
 

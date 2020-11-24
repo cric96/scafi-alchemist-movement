@@ -1,8 +1,6 @@
 package it.unibo.simulations
 
-import it.unibo.alchemist.model.scafi.ScafiIncarnationForAlchemist.{ScafiAlchemistSupport, _}
-import it.unibo.lib.{AlchemistEuclideanSupport, MovementAggregateProgram}
-import it.unibo.alchemist.model.scafi.ScafiIncarnationForAlchemist._
-class ConstantMovement extends MovementAggregateProgram with StandardSensors with ScafiAlchemistSupport with AlchemistEuclideanSupport {
-  override def movementBody(): Velocity = Velocity(1, 0)
+import it.unibo.lib.movement.AlchemistMovementIncarnation._
+class ConstantMovement extends Movement2DProgram  {
+  override def movementLogic(): Velocity = Velocity(1, 0)
 }

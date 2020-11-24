@@ -1,9 +1,6 @@
 package it.unibo.simulations
 
-import it.unibo.alchemist.model.scafi.ScafiIncarnationForAlchemist._
-import it.unibo.lib._
-class Flock extends MovementAggregateProgram
-  with StandardSensors with ScafiAlchemistSupport with FlockLib with AlchemistEuclideanSupport {
-
-  override def movementBody(): Velocity = flock()
+import it.unibo.lib.movement.AlchemistMovementIncarnation._
+class Flock extends Movement2DProgram with FlockLib {
+  override def movementLogic(): Velocity = flock()
 }

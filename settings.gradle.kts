@@ -1,1 +1,1 @@
-rootProject.name = "scafi-alchemist-skeleton"
+rootProject.name = "scafi-alchemist-movement"
